@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Usuários</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script> <!-- ícones -->
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-8 space-y-6">
+
+  <!-- Header com Perfil e Logout -->
+  <div class="w-full max-w-6xl flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Usuários Cadastrados</h1>
+    <div class="space-x-2">
+      <a href="/perfil" class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-md shadow-md">Perfil</a>
+      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md shadow-md">Sair</a>
+    </div>
+  </div>
+
+  <!-- Filtro -->
+  <form method="GET" action="/users" class="w-full max-w-6xl flex justify-end">
+    <input type="text" name="filtro" placeholder="Filtrar por nome ou CPF"
+           class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-64">
+    <button type="submit" class="ml-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md shadow-md">
+      Buscar
+    </button>
+  </form>
+
+  <!-- Tabela -->
+  <div class="w-full max-w-6xl overflow-auto rounded-lg shadow-md">
+    <table class="w-full table-auto text-left bg-gray-800 rounded-lg">
+      <thead>
+        <tr class="bg-gray-700 text-gray-300">
+          <th class="px-4 py-3">Nome</th>
+          <th class="px-4 py-3">CPF</th>
+          <th class="px-4 py-3">Email</th>
+          <th class="px-4 py-3">Telefone</th>
+          <% if (user.role === 'ADMIN') { %> 
+            <a href="/edit/<%= user.cpf %>" class="text-blue-500">✏️ Editar</a>
+            <a href="/delete/<%= user.cpf %>" class="text-red-500">❌ Excluir</a>
+          <% } %>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(u => { %>
+          <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
+            <td class="px-4 py-2"><%= u.name %></td>
+            <td class="px-4 py-2"><%= u.cpf %></td>
+            <td class="px-4 py-2"><%= u.email %></td>
+            <td class="px-4 py-2"><%= u.phone %></td>
+            <% if (user && user.role === 'admin') { %>
+              <td class="px-4 py-2 flex space-x-2">
+                <a href="/users/<%= u.cpf %>/edit" class="text-yellow-400 hover:text-yellow-300">
+                  <i data-lucide="pencil" class="w-5 h-5"></i>
+                </a>
+                <form method="POST" action="/users/<%= u.cpf %>/delete" onsubmit="return confirm('Tem certeza que deseja excluir?');">
+                  <button type="submit" class="text-red-500 hover:text-red-400">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                  </button>
+                </form>
+              </td>
+            <% } %>
+          </tr>
+        <% }) %>
+
+        <!-- Navegação de Páginas -->
+        <div class="w-full max-w-6xl flex justify-between items-center mt-6">
+          <div class="text-sm text-gray-300">
+            Página <%= page %> de <%= totalPages %>
+          </div>
+
+          <div class="space-x-2">
+            <% if (page > 1) { %>
+              <a href="/users?page=<%= page - 1 %>" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md shadow-md"><</a>
+            <% } %>
+
+            <% if (page < totalPages) { %>
+              <a href="/users?page=<%= page + 1 %>" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md shadow-md">></a>
+            <% } %>
+          </div>
+        </div>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    lucide.createIcons(); // Ativa os ícones do Lucide
+  </script>
+
+</body>
+</html>
