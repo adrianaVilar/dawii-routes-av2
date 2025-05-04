@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Usuário</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script> <!-- ícones -->
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-8 space-y-6">
+
+  <!-- Header com Voltar e Logout -->
+  <div class="w-full max-w-6xl flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Usuário selecionado</h1>
+    <div class="flex space-x-2">
+      <a href="/users" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md shadow-md">Voltar</a>
+      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md shadow-md">Sair</a>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div class="w-full max-w-6xl overflow-auto rounded-lg shadow-md">
+    <table class="w-full table-auto text-left bg-gray-800 rounded-lg">
+      <thead>
+        <tr class="bg-gray-700 text-gray-300">
+          <th class="px-4 py-3">Nome</th>
+          <th class="px-4 py-3">CPF</th>
+          <th class="px-4 py-3">Email</th>
+          <th class="px-4 py-3">Telefone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-t border-gray-700 hover:bg-gray-700 transition">
+          <td class="px-4 py-2"><%= userInfo.name %></td>
+          <td class="px-4 py-2"><%= userInfo.cpf %></td>
+          
+          <td class="px-4 py-2">
+            <ul>
+              <% emails.forEach(e => { %>
+                <li>
+                  <%= e.email %>
+                  <% if (e.principal) { %>
+                    <span class="text-green-400">(Principal)</span>
+                  <% } %>
+                </li>
+              <% }) %>
+            </ul>
+          </td>
+
+          <td class="px-4 py-2">
+            <ul>
+              <% phones.forEach(p => { %>
+                <li>
+                  <%= p.phone %>
+                  <% if (p.principal) { %>
+                    <span class="text-green-400">(Principal)</span>
+                  <% } %>
+                </li>
+              <% }) %>
+            </ul>
+          </td>
+
+          <% if (user.role == "ADMIN" || user.cpf == userInfo.cpf) { %>
+            <td class="px-4 py-2 flex space-x-2">
+              <a href="/updateUser/<%= userInfo.id %>" class="text-yellow-400 hover:text-yellow-300">
+                <i data-lucide="pencil" class="w-5 h-5"></i>
+              </a>
+          <% } %>
+
+          <% if ((user.role == "ADMIN" && user.cpf == userInfo.cpf) || (user.role == "ADMIN" && userInfo.role == "CLIENTE")) { %>
+              <form method="GET" action="/deleteUser/<%= userInfo.id %>" onsubmit="return confirm('Tem certeza que deseja excluir?');">
+                <button type="submit" class="text-red-500 hover:text-red-400">
+                  <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+              </form>
+            </td>
+          <% } %>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    lucide.createIcons(); // Ativa os ícones do Lucide
+  </script>
+
+</body>
+</html>

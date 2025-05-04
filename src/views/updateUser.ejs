@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Editar usuário</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script> <!-- ícones -->
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-8 space-y-6">
+
+  <div class="w-full max-w-3xl">
+    <h1 class="text-2xl font-bold mb-4">Editar usuário</h1>
+
+    <form action="/updateUser/<%= userInfo.id %>" method="POST" class="space-y-4">
+
+      <!-- Nome -->
+      <div>
+        <label class="block text-sm font-bold mb-1">Nome:</label>
+        <input name="name" value="<%= userInfo.name %>" class="w-full px-4 py-2 bg-gray-800 rounded-md" required>
+      </div>
+
+      <!-- CPF (readonly) -->
+      <div>
+        <label class="block text-sm font-bold mb-1">CPF:</label>
+        <input value="<%= userInfo.cpf %>" readonly class="w-full px-4 py-2 bg-gray-700 rounded-md text-gray-400">
+      </div>
+
+      <!-- Role (readonly) -->
+      <div>
+        <label class="block text-sm font-bold mb-1">Perfil:</label>
+        <input value="<%= userInfo.role %>" readonly class="w-full px-4 py-2 bg-gray-700 rounded-md text-gray-400">
+      </div>
+
+      <!-- Emails -->
+      <div>
+        <label class="block text-sm font-bold mb-1">E-mails:</label>
+        <div id="emails" class="space-y-2">
+          <% emails.forEach((email, index) => { %>
+            <div class="flex items-center space-x-2">
+              <input name="emails[]" value="<%= email.email %>" class="px-4 py-2 bg-gray-800 rounded-md w-full" required>
+              <label class="text-sm">
+                <input type="radio" name="emailPrincipal" value="<%= index %>" <%= email.principal ? "checked" : "" %> >
+                Principal
+              </label>
+              <button data-lucide="trash-2" class="w-5 h-5 text-red-500 hover:text-red-400 cursor-pointer" type="button" onclick="this.parentNode.remove()"></button>
+            </div>
+          <% }) %>
+        </div>
+        <button type="button" onclick="addEmail()" class="mt-2 bg-green-600 hover:bg-green-700 px-3 py-1 rounded">+</button>
+      </div>
+
+      <!-- Telefones -->
+      <div>
+        <label class="block text-sm font-bold mb-1">Telefones:</label>
+        <div id="phones" class="space-y-2">
+          <% phones.forEach((phone, index) => { %>
+            <div class="flex items-center space-x-2">
+              <input name="phones[]" value="<%= phone.phone %>" class="px-4 py-2 bg-gray-800 rounded-md w-full" required>
+              <label class="text-sm">
+                <input type="radio" name="phonePrincipal" value="<%= index %>" <%= phone.principal ? "checked" : "" %> >
+                Principal
+              </label>
+              <button data-lucide="trash-2" class="w-5 h-5 text-red-500 hover:text-red-400 cursor-pointer" type="button" onclick="this.parentNode.remove()"></button>
+            </div>
+          <% }) %>
+        </div>
+        <button type="button" onclick="addPhone()" class="mt-2 bg-green-600 hover:bg-green-700 px-3 py-1 rounded">+</button>
+      </div>
+
+      <!-- Botões -->
+      <div class="flex justify-between mt-6">
+        <a href="/users" class="bg-gray-700 px-4 py-2 rounded hover:bg-gray-600">Cancelar</a>
+        <button type="submit" class="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700">Salvar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- JS para adicionar campos dinamicamente -->
+  <script>
+    lucide.createIcons();
+
+    function addEmail() {
+      const container = document.getElementById('emails');
+      const count = container.children.length;
+      container.insertAdjacentHTML('beforeend', `
+        <div class="flex items-center space-x-2">
+          <input name="emails[]" class="px-4 py-2 bg-gray-800 rounded-md w-full" required>
+          <label class="text-sm">
+            <input type="radio" name="emailPrincipal" value="${count}"> Principal
+          </label>
+          <button data-lucide="trash-2" class="w-5 h-5 text-red-500 hover:text-red-400 cursor-pointer" type="button" onclick="this.parentNode.remove()"></button>
+        </div>
+      `);
+      lucide.createIcons();
+    }
+
+    function addPhone() {
+      const container = document.getElementById('phones');
+      const count = container.children.length;
+      container.insertAdjacentHTML('beforeend', `
+        <div class="flex items-center space-x-2">
+          <input name="phones[]" class="px-4 py-2 bg-gray-800 rounded-md w-full" required>
+          <label class="text-sm">
+            <input type="radio" name="phonePrincipal" value="${count}"> Principal
+          </label>
+          <button data-lucide="trash-2" class="w-5 h-5 text-red-500 hover:text-red-400 cursor-pointer" type="button" onclick="this.parentNode.remove()"></button>
+        </div>
+      `);
+      lucide.createIcons();
+    }
+  </script>
+
+</body>
+</html>

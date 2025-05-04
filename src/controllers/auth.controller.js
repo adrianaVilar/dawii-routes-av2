@@ -13,22 +13,18 @@ const authController = {
 
                 const sessionUser = {
                     cpf: user.cpf,
-                    role: user.role
+                    role: user.role,
+                    id: user.id
                 }
 
                 req.session.user = sessionUser;
                 
                 return res.redirect('/users');
-
-                // res.render('usersList', {
-                //     usuarios: await usersDAO.findAll(), // Array de objetos com nome, cpf, email, telefone
-                //     user: req.session.user   // Objeto do usuário logado (com role, ex: "admin")
-                // });
             }
         } catch (err) {
-      console.error("Erro no login:", err);
-      return res.status(500).send("Erro no servidor ao tentar fazer login.");
-    }
+        console.error("Erro no login:", err);
+        return res.status(500).send("Erro no servidor ao tentar fazer login.");
+        }
     },
 
     logout(req, res) {

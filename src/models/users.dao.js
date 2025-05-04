@@ -6,15 +6,13 @@ const usersDAO = {
     return new Promise((resolve, reject) => {
       const offset = (page - 1) * limit; //qtd de usuários que vai pular
 
-      const query = "SELECT user.cpf, name, roles, email, phone FROM user "
-          + "INNER JOIN email ON (user.cpf = email.cpf) "
-          + "INNER JOIN phone ON (user.cpf = phone.cpf) GROUP BY user.cpf "
-          + "LIMIT ? OFFSET ?";
+      const query = `
+        SELECT user.cpf, user.id, name, email, phone FROM user 
+        INNER JOIN email ON (user.cpf = email.cpf) 
+        INNER JOIN phone ON (user.cpf = phone.cpf) GROUP BY user.cpf 
+        LIMIT ? OFFSET ?;`;
       
       db.all(query, [limit, offset], (err, rows) => {
-        console.log("LIMITE: ", limit);
-        console.log("OFFSET: ", offset);
-
         if (err) return reject(err);
         resolve(rows);
       });
@@ -27,6 +25,41 @@ const usersDAO = {
       db.get(query, [cpf], (err, row) => {
         if (err) return reject(err);
         resolve(row);
+      });
+    });
+  },
+
+  findById(id) {
+    return new Promise((resolve, reject) => {
+      const userQuery = "SELECT * FROM user WHERE id = ?;";
+      const emailQuery = `
+        SELECT email, principal
+        FROM email
+        WHERE cpf = (SELECT cpf FROM user WHERE id = ?);
+      `;
+      const phoneQuery = `
+        SELECT phone, principal
+        FROM phone
+        WHERE cpf = (SELECT cpf FROM user WHERE id = ?);
+      `;
+
+      db.get(userQuery, [id], (err, userRow) => {
+        if (err) return reject(err);
+
+        db.all(emailQuery, [id], (err, emailRows) => {
+          if (err) return reject(err);
+
+          db.all(phoneQuery, [id], (err, phoneRows) => {
+            if (err) return reject(err);
+
+            // Retorna um objeto contendo os dados de cada query
+            resolve({
+              user: userRow,
+              emails: emailRows,
+              phones: phoneRows
+            });
+          });
+        });
       });
     });
   },
@@ -57,13 +90,97 @@ const usersDAO = {
 
   countAll() {
     return new Promise((resolve, reject) => {
-      const query = "SELECT COUNT(*) AS count FROM user";
+      const query = "SELECT COUNT(*) AS count FROM user;";
       db.get(query, [], (err, row) => {
         if (err) return reject(err);
         resolve(row.count);
       });
     });
-  }
+  },
+
+  countByName(name) {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT COUNT(*) AS count FROM user WHERE name=?;";
+      db.get(query, [name], (err, row) => {
+        if (err) return reject(err);
+        resolve(row.count);
+      });
+    });
+  },
+
+  updateUserName: (cpf, name) => {
+    return new Promise((resolve, reject) => {
+      const update = "UPDATE user SET name = ? WHERE cpf = ?;";
+      db.run(update, [name, cpf], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+
+  deleteUserEmails: (cpf) => {
+    return new Promise((resolve, reject) => {
+      const queryDelete = "DELETE FROM email WHERE cpf = ?;";
+      db.run(queryDelete, [cpf], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+
+  insertEmail: ({ cpf, email, principal }) => {
+    return new Promise((resolve, reject) => {
+      const insert = "INSERT INTO email (cpf, email, principal) VALUES (?, ?, ?);";
+      db.run(insert, [cpf, email, principal], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+
+  deleteUserPhones: (cpf) => {
+    return new Promise((resolve, reject) => {
+      const queryDelete = "DELETE FROM phone WHERE cpf = ?;";
+      db.run(queryDelete, [cpf], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+
+  insertPhone: ({ cpf, phone, principal }) => {
+    return new Promise((resolve, reject) => {
+      const insert = "INSERT INTO phone (cpf, phone, principal) VALUES (?, ?, ?);";
+      db.run(insert, [cpf, phone, principal], (err) => {
+        if (err) reject(err);
+        else resolve({ success: true, message: "Telefone inserido com sucesso" });
+      });
+    });
+  },
+
+  deleteUser: (cpf) => {
+    return new Promise((resolve, reject) => {
+      const queryDelete = "DELETE FROM user WHERE cpf = ?;";
+      db.run(queryDelete, [cpf], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+
+  findCpfById: (id) => {
+    return new Promise((resolve, reject) => {
+      const query = `
+          SELECT user.cpf FROM user 
+          WHERE id = ?;`;
+        
+        db.get(query, [id], (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        });
+      })
+  },
+
 };
 
 module.exports = usersDAO;
