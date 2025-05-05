@@ -42,7 +42,6 @@ const usersController = {
 
     create: async (req, res) => {
         try {
-            console.log({ body: req.body });
             const user = req.body;
 
             user.password = hashSync(user.senha, 10);
@@ -51,7 +50,10 @@ const usersController = {
                 res.render('addedSuccessfully');
             }
         } catch (err) {
-            console.error("Erro ao inserir usuário:", err);
+            if (err == "Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: user.cpf") {
+                return res.render('addUser', { error: 'CPF já cadastrado.' });
+            }
+
             if (!res.headersSent) {
                 res.status(500).send("Erro ao inserir usuário");
             }
@@ -100,10 +102,15 @@ const usersController = {
         const id = req.params.id;
         const cpfRow = await usersDAO.findCpfById(id);
         const cpf = cpfRow?.cpf;
-        const { name, emails, emailPrincipal, phones, phonePrincipal } = req.body;
+        const { name, emails, emailPrincipal, phones, phonePrincipal, password } = req.body;
 
         try {
             await usersDAO.updateUserName(cpf, name);
+
+            if (password.length > 0) {
+                const hashPassword = hashSync(password, 10);
+                await usersDAO.updatePassword(cpf, hashPassword);
+            }
 
             await usersDAO.deleteUserEmails(cpf);
             for (let i = 0; i < emails.length; i++) {

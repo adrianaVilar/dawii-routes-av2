@@ -67,11 +67,11 @@ const usersDAO = {
   insert(user) {
     return new Promise((resolve, reject) => {
       db.serialize(() => {
-        const insertUser = "INSERT INTO user (name, cpf, password) VALUES (?, ?, ?);";
-        const insertEmail = "INSERT INTO email (cpf, email) VALUES (?, ?);";
-        const insertPhone = "INSERT INTO phone (cpf, phone) VALUES (?, ?);";
+        const insertUser = "INSERT INTO user (name, cpf, password, role) VALUES (?, ?, ?, ?);";
+        const insertEmail = "INSERT INTO email (cpf, email, principal) VALUES (?, ?, 1);";
+        const insertPhone = "INSERT INTO phone (cpf, phone, principal) VALUES (?, ?, 1);";
 
-        db.run(insertUser, [user.nome, user.cpf, user.password], function (err) {
+        db.run(insertUser, [user.nome, user.cpf, user.password, user.perfil], function (err) {
           if (err) return reject(err);
 
           db.run(insertEmail, [user.cpf, user.email], function (err) {
@@ -112,6 +112,16 @@ const usersDAO = {
     return new Promise((resolve, reject) => {
       const update = "UPDATE user SET name = ? WHERE cpf = ?;";
       db.run(update, [name, cpf], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  },
+
+  updatePassword: (cpf, password) => {
+    return new Promise((resolve, reject) => {
+      const update = "UPDATE user SET password = ? WHERE cpf = ?;";
+      db.run(update, [password, cpf], (err) => {
         if (err) reject(err);
         else resolve();
       });

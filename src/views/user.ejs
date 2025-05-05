@@ -11,9 +11,13 @@
   <!-- Header com Voltar e Logout -->
   <div class="w-full max-w-6xl flex justify-between items-center">
     <h1 class="text-2xl font-bold">Usuário selecionado</h1>
-    <div class="flex space-x-2">
-      <a href="/users" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md shadow-md">Voltar</a>
-      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md shadow-md">Sair</a>
+    <div class="px-4 py-2 flex space-x-2">
+      <a href="/users" class="bg-blue-600 hover:bg-blue-700 px-4 py-4 rounded-md shadow-md">
+        <i data-lucide="house" class="w-5 h-5"></i>
+      </a>
+      <a href="/logout" class="bg-red-600 hover:bg-red-700 px-4 py-4 rounded-md shadow-md">
+        <i data-lucide="log-out" class="w-5 h-5"></i>
+      </a>
     </div>
   </div>
 
@@ -67,11 +71,26 @@
           <% } %>
 
           <% if ((user.role == "ADMIN" && user.cpf == userInfo.cpf) || (user.role == "ADMIN" && userInfo.role == "CLIENTE")) { %>
-              <form method="GET" action="/deleteUser/<%= userInfo.id %>" onsubmit="return confirm('Tem certeza que deseja excluir?');">
-                <button type="submit" class="text-red-500 hover:text-red-400">
-                  <i data-lucide="trash-2" class="w-5 h-5"></i>
-                </button>
-              </form>
+              <!-- Botão de deletar -->
+              <button type="button" onclick="openModal('<%= userInfo.id %>')" class="text-red-500 hover:text-red-400">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+              </button>
+
+              <!-- Modal de confirmação -->
+              <div id="modal-<%= userInfo.id %>" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 opacity-0 pointer-events-none transition-opacity duration-300">
+                <div id="modal-card-<%= userInfo.id %>" class="bg-white text-black rounded-lg shadow-lg p-6 w-full max-w-sm transform scale-95 transition-all duration-300 opacity-0">
+                  <h2 class="text-lg font-bold">Confirmar exclusão</h2>
+                  <p class="mt-2">Tem certeza que deseja excluir este usuário? Essa operação não poderá ser desfeita.</p>
+                  
+                  <div class="flex justify-end space-x-4 mt-4">
+                    <button onclick="closeModal('<%= userInfo.id %>')" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
+                    
+                    <form method="GET" action="/deleteUser/<%= userInfo.id %>">
+                      <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Excluir</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </td>
           <% } %>
         </tr>
@@ -81,7 +100,32 @@
 
   <script>
     lucide.createIcons(); // Ativa os ícones do Lucide
-  </script>
 
+    function openModal(id) {
+      const modal = document.getElementById('modal-' + id);
+      const card = document.getElementById('modal-card-' + id);
+
+      modal.classList.remove('pointer-events-none');
+      modal.classList.add('opacity-100');
+
+      setTimeout(() => {
+        card.classList.add('opacity-100', 'scale-100');
+        card.classList.remove('scale-95');
+      }, 10);
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById('modal-' + id);
+      const card = document.getElementById('modal-card-' + id);
+
+      card.classList.remove('opacity-100', 'scale-100');
+      card.classList.add('scale-95');
+
+      setTimeout(() => {
+        modal.classList.remove('opacity-100');
+        modal.classList.add('pointer-events-none');
+      }, 300); // tempo igual à duração do transition
+    }
+  </script>
 </body>
 </html>

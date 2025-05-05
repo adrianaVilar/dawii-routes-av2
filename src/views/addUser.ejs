@@ -4,17 +4,6 @@
   <meta charset="UTF-8">
   <title>Cadastro</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    function adicionarCampo(id, name) {
-      const container = document.getElementById(id);
-      const input = document.createElement("input");
-      input.type = "text";
-      input.name = name;
-      input.placeholder = name.charAt(0).toUpperCase() + name.slice(1);
-      input.className = "bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner mt-2 w-full";
-      container.appendChild(input);
-    }
-  </script>
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
   <form action="/users" method="POST" class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md space-y-4">
@@ -22,26 +11,29 @@
 
     <input type="text" name="nome" placeholder="Nome" required class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-full">
     <input type="text" name="cpf" placeholder="CPF" required class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-full">
-
-    <div id="emails" class="space-y-2">
-      <input type="email" name="email" placeholder="Email principal" required class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-full">
-    </div>
-    <button type="button" onclick="adicionarCampo('emails', 'email')" class="text-sm text-blue-400 hover:underline">+ Adicionar outro email</button>
-
-    <div id="telefones" class="space-y-2">
-      <input type="text" name="telefone" placeholder="Telefone principal" required class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-full">
-    </div>
-    <button type="button" onclick="adicionarCampo('telefones', 'telefone')" class="text-sm text-blue-400 hover:underline">+ Adicionar outro telefone</button>
-
+    
+    <% if (typeof error !== 'undefined') { %>
+      <p class="text-sm text-red-500 text-center"><%= error %></p>
+    <% } %>
+    
+    <input type="email" name="email" placeholder="Email principal" required class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-full">
+    <input type="text" name="telefone" placeholder="Telefone principal" required class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-full">
     <input type="password" name="senha" placeholder="Senha" required class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-full">
 
     <select name="perfil" required class="bg-gray-800 text-white rounded-md px-4 py-2 shadow-inner w-full">
       <option value="">Selecione o perfil</option>
-      <option value="admin">Administrador</option>
-      <option value="cliente">Cliente</option>
+      <option value="ADMIN">Administrador</option>
+      <option value="CLIENTE">Cliente</option>
     </select>
 
-    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-md w-full">Cadastrar</button>
+    <div class="flex space-x-4">
+      <a href="/" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md shadow-md w-full text-center">
+        Cancelar
+      </a>
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-md w-full">
+        Cadastrar
+      </button>
+    </div>
   </form>
 </body>
 </html>
